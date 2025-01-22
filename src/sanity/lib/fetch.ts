@@ -1,10 +1,10 @@
 import { createClient } from "next-sanity";
 
 const client = createClient({
-  projectId: "nyw8htzm",
-  dataset: "production",
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID, // Use environment variable
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET, // Use environment variable
   useCdn: true,
-  apiVersion: "2021-08-31",
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION, // Use environment variable
 });
 
 export async function sanityFetch({
