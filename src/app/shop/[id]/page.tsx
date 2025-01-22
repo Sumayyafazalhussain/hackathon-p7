@@ -12,24 +12,26 @@ type Product = {
   imageUrl?: string;
   discountPercentage?: number;
   tags?: string[];
+  quantity?: number; // Added optional quantity property for cart
 };
 
 const placeholderImage = "https://via.placeholder.com/300";
 
-const ProductDetail = () => {
-  const { id } = useParams();
+const ProductDetail: React.FC = () => {
+  const { id } = useParams() as { id: string };
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    // Fetch product details
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+
+        // Fetch product details
         const productQuery = `
           *[_type == "product" && _id == $id][0] {
             _id,
@@ -44,8 +46,8 @@ const ProductDetail = () => {
         const productResult = await sanityFetch({ query: productQuery, params: { id } });
         setProduct(productResult);
 
-        // Fetch related products
-        if (productResult?.tags) {
+        // Fetch related products if tags are available
+        if (productResult?.tags?.length) {
           const relatedQuery = `
             *[_type == "product" && _id != $id && count(tags[@ in $tags]) > 0] {
               _id,
@@ -94,9 +96,13 @@ const ProductDetail = () => {
     alert(`${product.title} x${quantity} added to cart!`);
   };
 
-  if (loading) return <p className="text-center text-yellow-500">Loading...</p>;
+  if (loading) {
+    return <p className="text-center text-yellow-500">Loading...</p>;
+  }
 
-  if (!product) return <p className="text-center text-red-500">Product not found.</p>;
+  if (!product) {
+    return <p className="text-center text-red-500">Product not found.</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-100 via-purple-100 to-gray-100 p-6">
@@ -170,7 +176,7 @@ const ProductDetail = () => {
             {relatedProducts.map((related) => (
               <div
                 key={related._id}
-                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-transform hover:scale-105"
+                className="bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-transform hover:scale-105 cursor-pointer"
                 onClick={() => router.push(`/shop/${related._id}`)}
               >
                 <img

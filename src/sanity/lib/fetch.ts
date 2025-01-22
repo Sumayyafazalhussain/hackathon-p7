@@ -1,10 +1,10 @@
 import { createClient } from "next-sanity";
 
 const client = createClient({
-  projectId: process.env.SANITY_PROJECT_ID!,
-  dataset: process.env.SANITY_DATASET!,
+  projectId: "nyw8htzm",
+  dataset: "production",
   useCdn: true,
-  apiVersion: process.env.SANITY_API_VERSION!,
+  apiVersion: "2021-08-31",
 });
 
 export async function sanityFetch({
@@ -14,5 +14,7 @@ export async function sanityFetch({
   query: string;
   params?: any;
 }) {
-  return await client.fetch(query, params);
+  const result = await client.fetch(query, params);
+  console.log("Fetched data:", result); // Debug fetched data
+  return result;
 }
